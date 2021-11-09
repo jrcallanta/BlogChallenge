@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+
+  <div class="container-fluid">
+    <h1 class="page-title"> <%- pageTitle %> </h1>
+    <form class="" action="/api/new-post" method="post">
+      <div class="form-group">
+        <label for="newPostTitle">Title</label>
+        <input oninput="validate(this)" class="form-control new-post-text mb-4" type="text" name="newPostTitle" value="">
+        <label for="newPostBody">Body</label>
+        <textarea oninput="validate(this)" class="form-control new-post-text" type="text" name="newPostBody" rows="8" cols="80"></textarea>
+        <p class="form-text text-muted m-0" name="newPostFeedback">0 characters</p>
+      </div>
+      <button class="btn btn-dark ms-0 mt-4" disabled="true" type="submit" name="newPostSubmit">POST</button>
+    </form>
+  </div>
+
+<%- include('partials/footer') %>
+
+<script type="text/javascript">
+  let postTitle = document.querySelector("input[name='newPostTitle']");
+  let postBody = document.querySelector("textarea[name='newPostBody']")
+
+  function validate(textarea){
+    if(textarea == postBody)
+      document.querySelector("p[name='newPostFeedback']").innerHTML = textarea.value.length + " characters"
+
+    if(postTitle.value !== "" && postBody.value !== ""){
+      document.querySelector("button[name='newPostSubmit']").disabled = false;
+    } else {
+      document.querySelector("button[name='newPostSubmit']").disabled = true;
+    }
+  }
+</script>

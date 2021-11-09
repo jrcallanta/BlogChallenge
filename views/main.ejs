@@ -1,0 +1,55 @@
+<%- include("partials/header") %>
+
+<div class="container-fluid">
+  <h1 class="page-title"><%= contents[selected]["title"] %></h1>
+  <p class=""><%= contents[selected]["text"] %> </p>
+</div>
+
+<% if(selected == 0 && posts.length !== 0) { %>
+<div class="container-fluid p-0">
+<%    for(let p of posts){ %>
+    <div id="<%-p['id']%>" class="post-tile" onmouseover="showDelete(this)" onmouseout="hideDelete(this)">
+      <div class="d-flex">
+        <div class="col mb-3 align-items-baseline">
+          <h1 class="post-tile-title mb-1"> <%- p['title'] %> </h1>
+          <h1 class="post-tile-date mb-0"> <%- p['date'] %> </h1>
+        </div>
+        <div name="delete" class="" hidden="true">
+          <form class="" action="/api/delete-post" method="post">
+            <input type="text" name="postObject" value='<%- JSON.stringify(p) %>' hidden="true">
+            <h1 style="cursor: pointer;" onclick="this.parentElement.submit()" class="post-tile-date me-3">delete</h1>
+          </form>
+        </div>
+      </div>
+      <div class="post-tile-body mb-0">
+        <p class="mb-0">
+          <% if(p['body'].length < 400) { %>
+            <%- p['body'] %>
+          <% } else { %>
+            <%- p['body'].substring(0, 300).trim() + "..." %>
+            <span><a style="all:unset; color: #000a; font-weight: normal; cursor: pointer;" href="/posts/<%-p['title']%>">Read more</a></span>
+          <% } %>
+        </p>
+      </div>
+    </div>
+<%    } %>
+</div>
+<% } %>
+
+<%- include("partials/footer") %>
+
+
+<!-- SCRIPTING -->
+<script type="text/javascript">
+  function goToPost(postObject){
+
+  }
+  function showDelete(postDiv){
+    let post = postDiv.querySelector("div[name='delete']")
+    post.hidden = false;
+  }
+  function hideDelete(postDiv){
+    let post = postDiv.querySelector("div[name='delete']")
+    post.hidden = true;
+  }
+</script>
