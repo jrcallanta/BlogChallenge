@@ -1,2 +1,7 @@
 # ignoring all node modules for convenience
-node_modules
+/node_modules
+
+# other
+npm-debug.log
+.DS_Store
+/*.env

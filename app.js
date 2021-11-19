@@ -84,6 +84,6 @@ app.post("/api/delete-post", async (req,res)=>{
 
 
 
-app.listen(port, ()=>{
-  console.log("Listening on port " + port);
+app.listen(process.env.PORT || port, ()=>{
+  console.log("Server has started succesfully!");
 })
