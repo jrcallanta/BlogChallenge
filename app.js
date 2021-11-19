@@ -4,19 +4,28 @@ const lodash = require('lodash')
 const port = 3000
 const app = express()
 
-const data = require(__dirname + '/views/content/data.js')
-
 app.set("view engine", "ejs");
 app.use(bodyparser.urlencoded({extended: true}))
 app.use(express.static(__dirname + '/public'))
 
-app.get("/home", (req, res)=>{
-  res.render("main", {
-    selected: 0,
-    contents: data.contents,
-    pageTitle: data.contents[0]['title'],
-    posts: data.posts
-  })
+// const data = require(__dirname + '/views/content/data.js')
+const data = require(__dirname + '/views/content/db.js')
+data.connect()
+
+app.get("/", async (req, res)=>{
+  await data.refreshPosts()
+  // await data.loadLorem()
+  res.redirect("/home")
+})
+
+app.get("/home", async (req, res)=>{
+  if(data.contents){
+    await data.refreshPosts()
+    res.render("main", {selected: 0, contents: data.contents, pageTitle: data.contents[0]['title'], posts: data.posts})
+  } else {
+    console.log("redirecting...")
+    res.redirect("/")
+  }
 })
 
 app.get("/about", (req, res)=>{
@@ -31,47 +40,45 @@ app.get("/compose", (req,res)=>{
   res.render("compose", {selected: 3, contents: data.contents, pageTitle: "New Post"})
 })
 
-app.get("/posts/:postTitle", (req,res)=>{
-  const titleQuery = req.params.postTitle;
-  data.posts.forEach((post)=>{
-    console.log(lodash.lowerCase(post['title']))
-    console.log(lodash.lowerCase(titleQuery))
+app.get("/posts/:postID", async (req,res)=>{
+  const post = await data.getPost(req.params.postID)
+  if(post){
+    console.log('match found')
+    console.log(post)
+    res.render("post", {selected: 5, contents: data.contents, pageTitle: post['title'], post: post})
+  }
 
-    if(lodash.lowerCase(post['title']) == lodash.lowerCase(titleQuery)){
-      console.log('match found')
-      console.log(post)
-      res.render("post", {selected: 5, contents: data.contents, pageTitle: "Some Post", post: post})
-    }
-  })
+  // data.posts.forEach((post)=>{
+  //   console.log(lodash.lowerCase(post['title']))
+  //   console.log(lodash.lowerCase(titleQuery))
+  //
+  //   if(lodash.lowerCase(post['title']) == lodash.lowerCase(titleQuery)){
+  //     console.log('match found')
+  //     console.log(post)
+  //     res.render("post", {selected: 5, contents: data.contents, pageTitle: "Some Post", post: post})
+  //   }
+  // })
 })
 
-app.post("/api/new-post", (req,res)=>{
+app.post("/api/new-post", async (req,res)=>{
   const date = new Intl.DateTimeFormat("en", {
     timeStyle: "short",
     dateStyle: "short"
   });
-  const postTitle = req.body.newPostTitle
-  const postDate = date.format(Date.now());
   const newPost = {
-    id: postDate,
-    date: postDate,
+    date: date.format(Date.now()),
     title: req.body.newPostTitle,
     body: req.body.newPostBody
   };
-  data.posts.push(newPost)
+  console.log(newPost)
+  await data.newPost(newPost)
   res.redirect("/home")
 })
 
-app.post("/api/delete-post", (req,res)=>{
-  const postToDelete = JSON.parse(req.body.postObject)
-  console.log(req.body)
+app.post("/api/delete-post", async (req,res)=>{
+  const postToDelete = req.body.postID
   console.log(postToDelete)
-
-  const i = data.posts.findIndex((object)=>{
-    return JSON.stringify(object) == JSON.stringify(postToDelete)
-  })
-  if(i > -1)
-    data.posts.splice(i,1);
+  await data.deletePost(postToDelete)
   res.redirect("/home")
 })
 

@@ -22,7 +22,7 @@
           <%   } else { %>
             <li class="nav-item">
           <%   } %>
-            <a class="nav-link" href="/<%-contents[i]['title']%>">
+            <a class="nav-link" href="/<%-contents[i]['title'].toLowerCase()%>">
               <%- contents[i]["title"] %>
             </a>
           </li>
