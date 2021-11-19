@@ -47,17 +47,6 @@ app.get("/posts/:postID", async (req,res)=>{
     console.log(post)
     res.render("post", {selected: 5, contents: data.contents, pageTitle: post['title'], post: post})
   }
-
-  // data.posts.forEach((post)=>{
-  //   console.log(lodash.lowerCase(post['title']))
-  //   console.log(lodash.lowerCase(titleQuery))
-  //
-  //   if(lodash.lowerCase(post['title']) == lodash.lowerCase(titleQuery)){
-  //     console.log('match found')
-  //     console.log(post)
-  //     res.render("post", {selected: 5, contents: data.contents, pageTitle: "Some Post", post: post})
-  //   }
-  // })
 })
 
 app.post("/api/new-post", async (req,res)=>{
